@@ -1,0 +1,99 @@
+!DOCTYPE html
+html lang=en
+head
+    meta charset=UTF-8
+    titleBuckshot Double Downtitle
+    link rel=stylesheet href=style.css
+head
+body
+    div id=game-container
+        h1Buckshot Double Downh1
+        div id=tableShotgun on Tablediv
+        div id=dealerDealerdiv
+        div id=buttons
+            button onclick=shootSelf()Shoot Selfbutton
+            button onclick=shootDealer()Shoot Dealerbutton
+        div
+        div id=logdiv
+    div
+    script src=game.jsscript
+body
+html
+let shells = ["blank", "live", "blank", "misfire", "rot", "live"];
+let currentShell = 0;
+let gameOver = false;
+
+function addMessage(msg) {
+    const log = document.getElementById("log");
+    log.innerHTML += msg + "<br>";
+    log.scrollTop = log.scrollHeight; // auto scroll
+}
+
+function playSound(filename) {
+    try {
+        const audio = new Audio('assets/audio/' + filename);
+        audio.play();
+    } catch(e) {
+        // ignore if file doesn't exist
+    }
+}
+
+function checkGameOver() {
+    if (currentShell >= shells.length) {
+        addMessage("🎲 Round over! Reload the page to play again.");
+        gameOver = true;
+    }
+}
+
+function nextTurn() {
+    currentShell++;
+    checkGameOver();
+}
+
+function shootSelf() {
+    if (gameOver) return;
+    let shell = shells[currentShell];
+    if (shell === "live") {
+        playSound('shot.mp3');
+        addMessage("💥 You got shot!");
+    } else if (shell === "misfire") {
+        playSound('blank.mp3');
+        addMessage("⚠️ The gun misfired. Lucky!");
+    } else if (shell === "rot") {
+        addMessage("🍂 The gun failed. You are safe.");
+    } else {
+        addMessage("✅ Safe… this time.");
+    }
+    dealerReact();
+    nextTurn();
+}
+
+function shootDealer() {
+    if (gameOver) return;
+    let shell = shells[currentShell];
+    if (shell === "live") {
+        playSound('shot.mp3');
+        addMessage("💥 Dealer got hit!");
+    } else if (shell === "misfire") {
+        playSound('blank.mp3');
+        addMessage("⚠️ The gun misfired. Dealer is safe!");
+    } else if (shell === "rot") {
+        addMessage("🍂 The gun failed. Dealer is fine.");
+    } else {
+        addMessage("✅ Blank… safe.");
+    }
+    dealerReact();
+    nextTurn();
+}
+
+function dealerReact() {
+    const reactions = [
+        "Dealer stares silently.",
+        "Dealer tilts head slightly.",
+        "Dealer whispers: 'Interesting choice.'",
+        "Dealer smirks faintly.",
+        "Dealer remains still, unreadable."
+    ];
+    let reaction = reactions[Math.floor(Math.random() * reactions.length)];
+    addMessage("👤 " + reaction);
+}
